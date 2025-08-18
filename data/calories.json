@@ -1,0 +1,22 @@
+{
+  "apple": {
+    "calories": 95,
+    "suggestion": "Great snack; high fiber."
+  },
+  "banana": {
+    "calories": 105,
+    "suggestion": "Add peanut butter for protein."
+  },
+  "rice": {
+    "calories": 200,
+    "suggestion": "Pair with veggies to balance."
+  },
+  "roti": {
+    "calories": 120,
+    "suggestion": "Pair with dal for protein."
+  },
+  "dosa": {
+    "calories": 168,
+    "suggestion": "Go easy on oil; add sambar."
+  }
+}

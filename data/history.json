@@ -1,0 +1,241 @@
+[
+  {
+    "id": "64fad13cbff141da9fafd699b46ccafc",
+    "timestamp": "2025-08-15T18:48:11.537097Z",
+    "items": [
+      {
+        "name": "hi",
+        "calories": null,
+        "suggestion": null
+      }
+    ],
+    "total": 0
+  },
+  {
+    "id": "f8cc37805ec5498eb3a3705a8770fcd6",
+    "timestamp": "2025-08-15T18:48:13.718220Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      }
+    ],
+    "total": 200
+  },
+  {
+    "id": "e6f6e6aa12944cd0980bcfc2a3c95d47",
+    "timestamp": "2025-08-15T18:48:49.406771Z",
+    "items": [
+      {
+        "name": "dosa",
+        "calories": 168,
+        "suggestion": "Go easy on oil; add sambar."
+      }
+    ],
+    "total": 168
+  },
+  {
+    "id": "ae86619d035e4c9cb66d3af89d0df69b",
+    "timestamp": "2025-08-15T18:49:33.968539Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      }
+    ],
+    "total": 320
+  },
+  {
+    "id": "387a7d5b6beb4a1a91174af09f6ab370",
+    "timestamp": "2025-08-15T18:55:16.972995Z",
+    "items": [
+      {
+        "name": "r",
+        "calories": null,
+        "suggestion": null
+      },
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      }
+    ],
+    "total": 200
+  },
+  {
+    "id": "9091d5fcb8de494e824f6b0373739bc1",
+    "timestamp": "2025-08-15T18:56:06.922274Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      },
+      {
+        "name": "dal",
+        "calories": null,
+        "suggestion": null
+      },
+      {
+        "name": "idli",
+        "calories": null,
+        "suggestion": null
+      }
+    ],
+    "total": 320
+  },
+  {
+    "id": "bff3cb96bc63487194830d5e665842af",
+    "timestamp": "2025-08-15T18:56:33.179951Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      }
+    ],
+    "total": 200
+  },
+  {
+    "id": "056d10df815f462aac03cb333177d76c",
+    "timestamp": "2025-08-15T18:57:11.714591Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      }
+    ],
+    "total": 320
+  },
+  {
+    "id": "8ffb273f3c864cbebdce41df8da824db",
+    "timestamp": "2025-08-15T19:07:55.083095Z",
+    "items": [
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      },
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "mango",
+        "calories": null,
+        "suggestion": null
+      },
+      {
+        "name": "apple",
+        "calories": 95,
+        "suggestion": "Great snack; high fiber."
+      },
+      {
+        "name": "dosa",
+        "calories": 168,
+        "suggestion": "Go easy on oil; add sambar."
+      },
+      {
+        "name": "sandwich",
+        "calories": null,
+        "suggestion": null
+      }
+    ],
+    "total": 583
+  },
+  {
+    "id": "a45d997aa8574a54833c3b8ea89e5ec7",
+    "timestamp": "2025-08-15T19:14:55.504496Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      },
+      {
+        "name": "sandwich",
+        "calories": null,
+        "suggestion": null
+      },
+      {
+        "name": "mango",
+        "calories": null,
+        "suggestion": null
+      },
+      {
+        "name": "apple",
+        "calories": 95,
+        "suggestion": "Great snack; high fiber."
+      }
+    ],
+    "total": 415
+  },
+  {
+    "id": "7c77d36e5a2b4b77b1825f54d7a62fe3",
+    "timestamp": "2025-08-15T19:18:13.971432Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      },
+      {
+        "name": "watermelon",
+        "calories": null,
+        "suggestion": null
+      }
+    ],
+    "total": 320
+  },
+  {
+    "id": "70cb793d31ee4dfdbbff25049f9e712b",
+    "timestamp": "2025-08-15T19:19:10.685359Z",
+    "items": [
+      {
+        "name": "rice",
+        "calories": 200,
+        "suggestion": "Pair with veggies to balance."
+      },
+      {
+        "name": "roti",
+        "calories": 120,
+        "suggestion": "Pair with dal for protein."
+      },
+      {
+        "name": "dal",
+        "calories": null,
+        "suggestion": null
+      }
+    ],
+    "total": 320
+  }
+]
