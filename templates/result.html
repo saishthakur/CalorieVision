@@ -1,107 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calorie Vision · Results</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    :root{--bg:#0b1020;--text:#f8f9fa;--muted:#cfd3d7;--glass:rgba(255,255,255,.12);--brd:rgba(255,255,255,.22);--shadow:0 24px 70px rgba(0,0,0,.45);--ok:#10b981;--warn:#f59e0b;--bad:#ef4444;}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
-    .bg-wrap{position:fixed;inset:0;z-index:-1}
-    .bg-wrap video{position:absolute;width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(1.1)}
-    .bg-grad{position:absolute;inset:0;background:radial-gradient(1200px 800px at 10% 10%, rgba(16,185,129,.25), transparent 60%), radial-gradient(1200px 800px at 90% 80%, rgba(59,130,246,.25), transparent 60%)}
-
-    .glass{backdrop-filter: blur(18px) saturate(120%);background:var(--glass);border:1px solid var(--brd);border-radius:26px;box-shadow:var(--shadow)}
-    .wrap{max-width:1100px;margin:3rem auto;padding:2rem}
-    .title{font-weight:800;letter-spacing:.2px;font-size:clamp(28px,4vw,48px)}
-
-    .ring{width:220px;height:220px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#16a34a calc(var(--p,0)*1%), rgba(255,255,255,.12) 0)}
-    .ring>div{width:180px;height:180px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);border:1px dashed rgba(255,255,255,.2)}
-
-    .list .item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.2rem;border-bottom:1px dashed rgba(255,255,255,.15)}
-    .badge{border-radius:999px;padding:.3rem .7rem;border:1px solid rgba(255,255,255,.2)}
-
-    .actions{display:flex;flex-wrap:wrap;gap:.6rem}
-    .cta{border:none;border-radius:14px;padding:.85rem 1rem;background:linear-gradient(135deg,#22d3ee,#7c3aed);color:#fff}
-    .cta-outline{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;border-radius:14px;padding:.85rem 1rem}
-
-    .footer{color:var(--muted)}
-  </style>
-</head>
-<body>
-  <div class="bg-wrap">
-    <video autoplay muted loop playsinline>
-      <source src="https://cdn.pixabay.com/video/2023/05/25/164095-834094829_large.mp4" type="video/mp4" />
-    </video>
-    <div class="bg-grad"></div>
-  </div>
-
-  <main class="wrap glass">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+<section class="glass panel">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+    <div>
+      <h1 class="hero-title mb-2">Your meal</h1>
+      <p class="muted mb-1">
+        {% if entry and entry.source in ("photo", "api-photo") %}<i class="bi bi-camera"></i> Recognized from a photo.{% else %}Calories and tips for each item.{% endif %}
+      </p>
+      <p class="muted mb-0" id="goalText"></p>
+    </div>
+    <div class="ring" id="ring">
       <div>
-        <h1 class="title mb-2">Your Results</h1>
-        <p class="text-secondary">Calories and tips for each item. Share with your friends or go back to try more.</p>
-      </div>
-      <div class="ring" style="--p: {{ total|int }};">
         <div>
-          <div class="text-center">
-            <div class="fs-1 fw-bold">{{ total }}</div>
-            <div class="text-secondary">Total cal</div>
-          </div>
+          <div class="fs-1 fw-bold">{{ total }}</div>
+          <div class="muted small">kcal total</div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="mt-4 list">
-      {% for r in results %}
-      <div class="item">
-        <div class="d-flex align-items-center gap-3">
-          <span class="badge">{{ loop.index }}</span>
-          <div>
-            <div class="fw-bold text-capitalize">{{ r.name }}</div>
-            <div class="text-secondary small">
-              {% if r.suggestion %}{{ r.suggestion }}{% else %}No suggestion yet{% endif %}
-            </div>
+  <div class="mt-4">
+    {% for r in results %}
+    <div class="item-row">
+      <div class="d-flex align-items-center gap-3">
+        <span class="num">{{ loop.index }}</span>
+        <div>
+          <div class="fw-bold text-capitalize">
+            {% if r.qty != 1 %}{{ '%g'|format(r.qty) }} × {% endif %}{{ r.name or r.query }}
+            {% if r.estimated %}<span class="tag ai" title="Not in our database; calories estimated by AI">AI estimate</span>{% endif %}
+            {% if r.corrected %}<span class="tag fix" title="Matched from what you typed">from “{{ r.query }}”</span>{% endif %}
           </div>
-        </div>
-        <div class="text-end">
-          {% if r.calories is not none %}
-            <div class="fw-bold">{{ r.calories }} cal</div>
+          {% if r.found %}
+            <div class="muted small">{{ r.suggestion }}</div>
           {% else %}
-            <div class="text-warning">Not found</div>
+            <div class="small">
+              <span class="text-warning">Not in our database.</span>
+              {% if r.alternatives %}
+                Did you mean
+                {% for alt in r.alternatives %}
+                <form class="d-inline" method="post" action="{{ url_for('web.analyze') }}">
+                  <input type="hidden" name="food" value="{{ (results|selectattr('found')|map(attribute='query')|list + [alt])|join(', ') }}">
+                  <button class="chip" type="submit">{{ alt }}</button>
+                </form>
+                {% endfor %}
+              {% endif %}
+            </div>
           {% endif %}
         </div>
       </div>
-      {% endfor %}
-    </div>
-
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
-      <div class="actions">
-        <button class="cta" id="copyBtn"><i class="bi bi-clipboard"></i> Copy summary</button>
-        <a class="cta-outline" href="/"><i class="bi bi-arrow-left"></i> Back</a>
+      <div class="text-end">
+        {% if r.found %}
+          <div class="fw-bold">{{ r.total }} kcal</div>
+          {% if r.qty != 1 %}<div class="muted small">{{ r.calories }} each</div>{% endif %}
+        {% else %}
+          <div class="muted">—</div>
+        {% endif %}
       </div>
-      <small class="footer">Calorie Vision · HackGrounds 2K25</small>
     </div>
-  </main>
+    {% endfor %}
+  </div>
 
+  <div class="d-flex flex-wrap gap-2 mt-4">
+    <a class="cta" href="{{ url_for('web.index') }}"><i class="bi bi-plus-lg"></i> Analyze more</a>
+    <button class="ghost" id="copyBtn" type="button"><i class="bi bi-clipboard"></i> <span>Copy summary</span></button>
+    <a class="ghost" href="{{ url_for('web.history_page') }}"><i class="bi bi-clock-history"></i> History</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
 <script>
   const results = {{ results|tojson }};
-  const totalCalories = {{ total|tojson }};
-  const summary = results.map(r => `${r.name}: ${(r.calories !== null ? r.calories : 'N/A')} cal`).join('\n') 
-                   + `\nTotal: ${totalCalories} cal`;
+  const total = {{ total|tojson }};
+  const goal = CV.goal();
+  const pct = Math.min(100, Math.round(total / goal * 100));
+  const ring = document.getElementById('ring');
+  ring.style.setProperty('--p', pct);
+  if (total > goal) ring.style.setProperty('--ring-color', 'var(--bad)');
+  else if (pct > 75) ring.style.setProperty('--ring-color', 'var(--warn)');
+  document.getElementById('goalText').textContent = `${Math.round(total / goal * 100)}% of your ${goal} kcal daily goal.`;
 
-  document.getElementById('copyBtn').addEventListener('click', async () => {
+  document.getElementById('copyBtn').addEventListener('click', async e => {
+    const label = e.currentTarget.querySelector('span');
+    const lines = results.map(r => r.found
+      ? `${r.qty !== 1 ? r.qty + ' × ' : ''}${r.name}: ${r.total} kcal${r.estimated ? ' (estimate)' : ''}`
+      : `${r.query}: not found`);
     try {
-      await navigator.clipboard.writeText(summary);
-      alert('Copied to clipboard!');
-    } catch (e) {
-      alert('Copy failed');
+      await navigator.clipboard.writeText(lines.join('\n') + `\nTotal: ${total} kcal`);
+      label.textContent = 'Copied!';
+    } catch {
+      label.textContent = 'Copy failed';
     }
+    setTimeout(() => label.textContent = 'Copy summary', 1800);
   });
 </script>
-
-</body>
-</html>
+{% endblock %}
