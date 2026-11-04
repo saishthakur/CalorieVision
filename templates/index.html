@@ -1,179 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Analyze{% endblock %}
+{% block content %}
+<section class="glass panel">
+  <h1 class="hero-title mb-2">What did you eat?</h1>
+  <p class="muted mb-4">Type your meal or snap a photo. Quantities like <kbd>2 roti</kbd>, <kbd>half pizza</kbd> or <kbd>a bowl of dal</kbd> work, and small typos are fixed for you.</p>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calorie Vision · Home</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    /* ====== CSS VARIABLES ====== */
-    :root{
-      --glass-bg: rgba(255,255,255,.16);
-      --glass-brd: rgba(255,255,255,.28);
-      --text: #f8f9fa; --muted:#cfd3d7;
-      --brand:#7c3aed; --brand-2:#22d3ee; --accent:#10b981; --warn:#f59e0b; --danger:#ef4444;
-      --shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;}
-    body{margin:0;background:#0b1020;color:var(--text);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;overflow-x:hidden}
-
-    /* ====== BACKGROUND VIDEO ====== */
-    .bg-wrap{position:fixed;inset:0;z-index:-2;}
-    .bg-wrap video{position:absolute;width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(1.2)}
-    .bg-gradient{position:absolute;inset:0;background:radial-gradient(1200px 800px at 10% 10%, rgba(124,58,237,.25), transparent 60%), radial-gradient(1200px 800px at 90% 90%, rgba(34,211,238,.25), transparent 60%)}
-
-    /* ====== GLASS CONTAINER ====== */
-    .glass{backdrop-filter: blur(16px) saturate(120%);background:var(--glass-bg);border:1px solid var(--glass-brd);border-radius:24px;box-shadow:var(--shadow)}
-    .card-xl{max-width:980px;margin-inline:auto}
-
-    /* ====== HERO ====== */
-    .hero-title{font-weight:800;letter-spacing:.2px;font-size:clamp(28px,5vw,56px)}
-    .hero-sub{color:var(--muted)}
-
-    /* ====== FORMS ====== */
-    .chip{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .85rem;border:1px dashed rgba(255,255,255,.25);border-radius:999px;color:var(--text);font-size:.9rem;margin:.25rem;background:rgba(255,255,255,.06)}
-    .chip kbd{background:rgba(255,255,255,.12);padding:.2rem .45rem;border-radius:6px}
-    .search{display:flex;gap:.6rem}
-    .search input{flex:1;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--text);padding:1rem 1.1rem;outline:none}
-    .search button{border:none;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;padding:.95rem 1.2rem;font-weight:700}
-    .search button:hover{filter:brightness(1.08)}
-    .muted{color:var(--muted)}
-
-    /* ====== TYPEAHEAD ====== */
-    .suggest{position:relative}
-    .suggest-list{position:absolute;top:100%;left:0;right:0;background:rgba(12,16,32,.9);border:1px solid rgba(255,255,255,.15);border-radius:14px;margin-top:.4rem;max-height:260px;overflow:auto;display:none}
-    .suggest-item{padding:.75rem 1rem;border-bottom:1px dashed rgba(255,255,255,.08);cursor:pointer}
-    .suggest-item:hover{background:rgba(255,255,255,.06)}
-
-    /* ====== UTILS ====== */
-    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);margin:1.2rem 0}
-    .pulse{animation:pulse 1.8s infinite}
-    @keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
-    .fade-up{animation:fadeUp .8s ease both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-
-    /* ====== AUDIO CONTROL ====== */
-    .audio-ctrl{position:fixed;right:1rem;bottom:1rem;display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-radius:999px;background:rgba(12,16,32,.66);border:1px solid rgba(255,255,255,.2);box-shadow:var(--shadow)}
-    .audio-ctrl button{all:unset;cursor:pointer}
-    .audio-ctrl .meter{width:84px;height:8px;border-radius:999px;background:rgba(255,255,255,.15);overflow:hidden}
-    .audio-ctrl .meter>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#34d399,#22d3ee,#60a5fa);transition:width .2s}
-
-    /* ====== FOOTER ====== */
-    .footer{color:var(--muted)}
-  </style>
-</head>
-<body>
-  <!-- Background video -->
-  <div class="bg-wrap">
-    <video autoplay muted loop playsinline>
-      <source src="https://cdn.pixabay.com/video/2023/05/25/164095-834094829_large.mp4" type="video/mp4" />
-    </video>
-    <div class="bg-gradient"></div>
-  </div>
-
-  <!-- Main card -->
-  <section class="container py-5">
-    <div class="glass p-4 p-md-5 card-xl fade-up">
-      <div class="row g-4 align-items-center">
-        <div class="col-lg-7">
-          <h1 class="hero-title mb-3">Calorie <span class="text-info">Vision</span></h1>
-          <p class="hero-sub mb-4">Type one or more foods (comma‑separated). Your results will include calories and smart suggestions. Hit <kbd>Enter</kbd> to analyze.</p>
-
-          <form class="search suggest" action="/analyze" method="post">
-            <input id="foodInput" name="food" autocomplete="off" placeholder="e.g. rice, roti, dal" required />
-            <button type="submit"><i class="bi bi-lightning-charge"></i> Analyze</button>
-            <div id="suggestList" class="suggest-list"></div>
-          </form>
-
-          <div class="divider"></div>
-
-          <div class="d-flex flex-wrap">
-            <span class="chip">Popular:<span class="ms-2 text-info">rice</span></span>
-            <span class="chip">Try:<span class="ms-2 text-success">roti</span></span>
-            <span class="chip">Mix:<span class="ms-2 text-warning">dal</span></span>
-            <span class="chip">Fruits:<span class="ms-2">banana</span></span>
-            <span class="chip">South:<span class="ms-2">dosa</span></span>
-            <span class="chip">Breakfast:<span class="ms-2">idli</span></span>
-          </div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <h5 class="mb-3"><i class="bi bi-keyboard"></i> Type it</h5>
+      <form class="suggest" action="{{ url_for('web.analyze') }}" method="post" id="textForm">
+        <div class="d-flex gap-2">
+          <input class="field" id="foodInput" name="food" autocomplete="off" placeholder="e.g. 2 roti, dal and rice" required />
+          <button class="cta" type="submit"><i class="bi bi-lightning-charge"></i> Analyze</button>
         </div>
-        <div class="col-lg-5">
-          <div class="glass p-4">
-            <h5 class="mb-3">How it works</h5>
-            <ol class="mb-0">
-              <li>Enter foods separated by commas.</li>
-              <li>We look up calories & tips from a curated DB.</li>
-              <li>See total calories + smart suggestions.</li>
-            </ol>
-          </div>
-        </div>
+        <div id="suggestList" class="suggest-list" role="listbox"></div>
+      </form>
+
+      <div class="mt-3">
+        <span class="muted small me-1">Try:</span>
+        {% for example in ["2 roti, dal, rice", "masala dosa, sambar", "2 eggs, bread, coffee", "half pizza and soda", "idli x3, sambar"] %}
+        <button type="button" class="chip" data-example="{{ example }}">{{ example }}</button>
+        {% endfor %}
       </div>
     </div>
 
-    <p class="footer text-center mt-4">Built for HackGrounds 2K25 • Demo MVP • <span class="pulse">Live</span></p>
-  </section>
-
-  <!-- Ambient audio (starts only after user click) -->
-  <audio id="ambient" preload="auto" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c9e3fe0c0.mp3?filename=ambient-piano-112191.mp3" type="audio/mpeg" />
-  </audio>
-  <div class="audio-ctrl">
-    <button id="audioToggle" title="Toggle music">
-      <i class="bi bi-music-note-beamed"></i>
-    </button>
-    <div class="meter"><span id="meterFill"></span></div>
-    <small class="muted">Ambient</small>
+    <div class="col-lg-5">
+      <h5 class="mb-3"><i class="bi bi-camera"></i> Snap it</h5>
+      {% if photo_error %}<div class="alert-glass mb-3"><i class="bi bi-exclamation-triangle"></i> {{ photo_error }}</div>{% endif %}
+      <form action="{{ url_for('web.analyze_photo') }}" method="post" enctype="multipart/form-data" id="photoForm">
+        <label class="dropzone d-block" id="dropzone">
+          <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" hidden {{ 'disabled' if not vision_enabled }}>
+          <i class="bi bi-image fs-2"></i>
+          <div>{{ 'Drop a meal photo or tap to choose' if vision_enabled else 'Photo recognition is off' }}</div>
+          {% if not vision_enabled %}<small class="muted">Set <code>ANTHROPIC_API_KEY</code> to enable it.</small>{% endif %}
+          <img id="preview" alt="" hidden>
+        </label>
+        <button class="cta w-100 justify-content-center mt-3" type="submit" id="photoBtn" disabled>
+          <i class="bi bi-stars"></i> <span>Recognize foods</span>
+        </button>
+      </form>
+    </div>
   </div>
+</section>
+{% endblock %}
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // --- typeahead suggestions (static list; could be fetched from /get_calories?food=... for dynamic) ---
-    const SUGGEST = [
-      'rice','roti','dal','idli','dosa','upma','poha','sambar','curd','paneer','chicken','fish','egg','apple','banana','mango','orange','grapes','biryani','pulao','paratha','chapati','maggi','pasta','noodles','salad','sandwich','milk','oats','cornflakes','tea','coffee'
-    ];
-    const $input = document.getElementById('foodInput');
-    const $list = document.getElementById('suggestList');
+{% block scripts %}
+<script>
+  const FOODS = {{ food_names|tojson }};
+  const $input = document.getElementById('foodInput');
+  const $list = document.getElementById('suggestList');
+  let active = -1;
 
-    function renderSuggest(items){
-      if(!items.length){ $list.style.display='none'; $list.innerHTML=''; return; }
-      $list.innerHTML = items.map(x=>`<div class="suggest-item">${x}</div>`).join('');
-      $list.style.display='block';
-      [...$list.children].forEach(el=>el.addEventListener('click',()=>{
-        const existing = $input.value.trim();
-        $input.value = existing ? existing.replace(/\s*$/, '') + ', ' + el.textContent : el.textContent;
-        $list.style.display='none';
-        $input.focus();
-      }));
-    }
+  function currentToken() { return $input.value.split(/,|\band\b|\+/).pop().replace(/^\s*[\d./]+\s*x?\s*/i, '').trim().toLowerCase(); }
 
-    $input.addEventListener('input', e=>{
-      const q = e.target.value.split(',').pop().trim().toLowerCase();
-      if(!q){ renderSuggest([]); return; }
-      const hits = SUGGEST.filter(x=>x.startsWith(q)).slice(0,8);
-      renderSuggest(hits);
+  function render(items) {
+    active = -1;
+    $list.innerHTML = '';
+    items.forEach(name => {
+      const el = document.createElement('div');
+      el.className = 'suggest-item';
+      el.textContent = name;
+      el.addEventListener('mousedown', e => { e.preventDefault(); pick(name); });
+      $list.appendChild(el);
     });
+    $list.style.display = items.length ? 'block' : 'none';
+  }
 
-    document.addEventListener('click', e=>{ if(!e.target.closest('.suggest')){ $list.style.display='none'; }});
+  function pick(name) {
+    const token = currentToken();
+    const v = $input.value;
+    $input.value = v.slice(0, v.toLowerCase().lastIndexOf(token)) + name + ', ';
+    render([]);
+    $input.focus();
+  }
 
-    // --- audio toggle & fake meter ---
-    const audio = document.getElementById('ambient');
-    const meter = document.getElementById('meterFill');
-    const toggle = document.getElementById('audioToggle');
-    let playing = false, raf;
-    function animate(){
-      const v = Math.random()*100; // visual placeholder
-      meter.style.width = (playing ? v : 0) + '%';
-      raf = requestAnimationFrame(animate);
+  $input.addEventListener('input', () => {
+    const q = currentToken();
+    if (!q) return render([]);
+    const starts = FOODS.filter(f => f.startsWith(q));
+    const contains = FOODS.filter(f => !f.startsWith(q) && f.includes(q));
+    render([...starts, ...contains].slice(0, 8));
+  });
+
+  $input.addEventListener('keydown', e => {
+    const items = [...$list.children];
+    if (!items.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      active = (active + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+      items.forEach((el, i) => el.classList.toggle('active', i === active));
+    } else if ((e.key === 'Enter' || e.key === 'Tab') && active >= 0) {
+      e.preventDefault();
+      pick(items[active].textContent);
+    } else if (e.key === 'Escape') {
+      render([]);
     }
-    toggle.addEventListener('click', async ()=>{
-      try{
-        if(!playing){ await audio.play(); playing = true; toggle.innerHTML='<i class="bi bi-pause-circle"></i>'; }
-        else{ audio.pause(); playing = false; toggle.innerHTML='<i class="bi bi-play-circle"></i>'; }
-      }catch(err){ console.warn(err); }
-    });
-    animate();
-  </script>
-</body>
-</html>
+  });
+  $input.addEventListener('blur', () => setTimeout(() => render([]), 100));
+
+  document.querySelectorAll('[data-example]').forEach(btn => btn.addEventListener('click', () => {
+    $input.value = btn.dataset.example;
+    document.getElementById('textForm').submit();
+  }));
+
+  // Photo upload: preview, drag and drop, busy state.
+  const $photo = document.getElementById('photoInput');
+  const $drop = document.getElementById('dropzone');
+  const $preview = document.getElementById('preview');
+  const $btn = document.getElementById('photoBtn');
+
+  function showPreview() {
+    const file = $photo.files[0];
+    $btn.disabled = !file;
+    if (!file) return;
+    $preview.src = URL.createObjectURL(file);
+    $preview.hidden = false;
+  }
+  $photo.addEventListener('change', showPreview);
+  if (!$photo.disabled) {
+    ['dragenter', 'dragover'].forEach(ev => $drop.addEventListener(ev, e => { e.preventDefault(); $drop.classList.add('drag'); }));
+    ['dragleave', 'drop'].forEach(ev => $drop.addEventListener(ev, e => { e.preventDefault(); $drop.classList.remove('drag'); }));
+    $drop.addEventListener('drop', e => { $photo.files = e.dataTransfer.files; showPreview(); });
+  }
+  document.getElementById('photoForm').addEventListener('submit', () => {
+    $btn.disabled = true;
+    $btn.querySelector('span').textContent = 'Looking at your plate…';
+  });
+</script>
+{% endblock %}
