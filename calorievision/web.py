@@ -5,6 +5,8 @@ import uuid
 
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 
+from .vision import VisionError, identify_foods
+
 bp = Blueprint("web", __name__)
 
 
@@ -33,6 +35,11 @@ def index():
     return render_template("index.html", food_names=foods().names())
 
 
+@bp.app_context_processor
+def inject_flags():
+    return {"vision_enabled": bool(current_app.config["ANTHROPIC_API_KEY"])}
+
+
 @bp.route("/get_calories")
 def get_calories():
     item = foods().lookup(request.args.get("food", ""))
@@ -50,6 +57,34 @@ def analyze():
         return render_template("notfound.html", query=query, suggestions=hints), 404
     entry = record(items, total)
     return render_template("result.html", results=entry["items"], total=total)
+
+
+def analyze_photo_upload():
+    """Run vision on request.files["photo"]; returns (items, total)."""
+    upload = request.files.get("photo")
+    if not upload or not upload.filename:
+        raise VisionError("Choose a photo to upload.")
+    cfg = current_app.config
+    detected = identify_foods(
+        upload.read(),
+        api_key=cfg["ANTHROPIC_API_KEY"],
+        model=cfg["VISION_MODEL"],
+        known_foods=foods().names(),
+    )
+    if not detected:
+        raise VisionError("No food spotted in that photo. Try a closer, well-lit shot.")
+    items = [foods().from_detection(d.name, d.quantity, d.calories_per_serving, d.tip) for d in detected]
+    return items, sum(i.total for i in items)
+
+
+@bp.post("/analyze-photo")
+def analyze_photo():
+    try:
+        items, total = analyze_photo_upload()
+    except VisionError as e:
+        return render_template("index.html", food_names=foods().names(), photo_error=str(e)), 400
+    entry = record(items, total, source="photo")
+    return render_template("result.html", results=entry["items"], total=total, entry=entry)
 
 
 @bp.route("/history")

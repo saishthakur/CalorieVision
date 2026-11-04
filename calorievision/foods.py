@@ -83,6 +83,7 @@ class Item:
     calories: int | None = None  # per serving
     suggestion: str | None = None
     corrected: bool = False
+    estimated: bool = False  # calories are an AI estimate, not from the DB
     alternatives: list[str] = field(default_factory=list)
 
     @property
@@ -139,6 +140,19 @@ class FoodDB:
             info = self.foods[name]
             item.name, item.corrected = name, corrected
             item.calories, item.suggestion = info["calories"], info["suggestion"]
+        return item
+
+    def from_detection(self, name: str, qty: float, est_calories: int, tip: str) -> Item:
+        """Turn a food spotted in a photo into an Item, preferring DB values."""
+        item = Item(query=name, qty=qty)
+        canonical, corrected, _ = self.resolve(name)
+        if canonical:
+            info = self.foods[canonical]
+            item.name, item.corrected = canonical, corrected
+            item.calories, item.suggestion = info["calories"], info["suggestion"]
+        else:
+            item.name, item.calories, item.suggestion = name.lower(), est_calories, tip
+            item.estimated = True
         return item
 
     def analyze(self, text: str) -> tuple[list[Item], int]:

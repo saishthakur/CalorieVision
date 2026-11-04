@@ -13,5 +13,5 @@ class Config:
     HISTORY_PATH = DATA_DIR / "history.json"
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 8 MB uploads
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-    VISION_MODEL = os.environ.get("CALORIEVISION_VISION_MODEL", "claude-haiku-5-5")
+    VISION_MODEL = os.environ.get("CALORIEVISION_VISION_MODEL", "claude-opus-5-5")
     TEMPLATES_AUTO_RELOAD = True

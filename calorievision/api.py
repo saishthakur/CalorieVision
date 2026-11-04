@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from flask import Blueprint, current_app, jsonify, request
 
-from .web import foods, history, record
+from .vision import VisionError
+from .web import analyze_photo_upload, foods, history, record
 
 bp = Blueprint("api", __name__, url_prefix="/api/v1")
 
@@ -39,6 +40,15 @@ def analyze():
         entry = record(items, total, source="api")
         return jsonify(entry), 201
     return jsonify({"items": [i.to_dict() for i in items], "total": total})
+
+
+@bp.post("/analyze-photo")
+def analyze_photo():
+    try:
+        items, total = analyze_photo_upload()
+    except VisionError as e:
+        return jsonify({"error": str(e)}), 400
+    return jsonify(record(items, total, source="api-photo")), 201
 
 
 @bp.get("/history")
