@@ -7,6 +7,20 @@ import threading
 from pathlib import Path
 
 
+def _upgrade(entry: dict) -> dict:
+    """Fill in fields missing from entries saved by the original app.py."""
+    entry.setdefault("source", "text")
+    for item in entry.get("items", []):
+        found = item.setdefault("found", item.get("calories") is not None)
+        item.setdefault("query", item.get("name"))
+        item.setdefault("qty", 1)
+        item.setdefault("total", item.get("calories") if found else None)
+        item.setdefault("corrected", False)
+        item.setdefault("estimated", False)
+        item.setdefault("alternatives", [])
+    return entry
+
+
 class HistoryStore:
     """Append-only list of analyses in a JSON file, guarded by a lock."""
 
@@ -16,9 +30,10 @@ class HistoryStore:
 
     def all(self) -> list[dict]:
         try:
-            return json.loads(self.path.read_text(encoding="utf-8"))
+            hist = json.loads(self.path.read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError):
             return []
+        return [_upgrade(e) for e in hist]
 
     def add(self, entry: dict) -> None:
         with self._lock:
