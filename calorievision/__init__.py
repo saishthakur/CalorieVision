@@ -22,7 +22,9 @@ def create_app(overrides: dict | None = None) -> Flask:
     app.extensions["foods"] = FoodDB(app.config["FOODS_PATH"])
     app.extensions["history"] = HistoryStore(app.config["HISTORY_PATH"])
 
+    from .api import bp as api_bp
     from .web import bp as web_bp
 
     app.register_blueprint(web_bp)
+    app.register_blueprint(api_bp)
     return app
