@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import uuid
 
-from flask import Blueprint, current_app, jsonify, render_template, request
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 
 bp = Blueprint("web", __name__)
 
@@ -50,3 +50,26 @@ def analyze():
         return render_template("notfound.html", query=query, suggestions=hints), 404
     entry = record(items, total)
     return render_template("result.html", results=entry["items"], total=total)
+
+
+@bp.route("/history")
+def history_page():
+    return render_template("history.html", days=history().by_day())
+
+
+@bp.route("/history/<entry_id>")
+def history_entry(entry_id: str):
+    entry = history().get(entry_id) or abort(404)
+    return render_template("result.html", results=entry["items"], total=entry["total"], entry=entry)
+
+
+@bp.post("/history/<entry_id>/delete")
+def history_delete(entry_id: str):
+    history().delete(entry_id)
+    return redirect(url_for("web.history_page"))
+
+
+@bp.post("/history/clear")
+def history_clear():
+    history().clear()
+    return redirect(url_for("web.history_page"))
